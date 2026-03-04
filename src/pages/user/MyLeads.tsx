@@ -28,7 +28,7 @@ const MyLeads = () => {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="font-bold text-2xl">Mes Prospects</h1>
                 <span className="bg-blue-600 px-3 py-1 rounded-full text-sm">
-                    {leads.length} Leads assignés
+                    {leads.length} Assigned Leads
                 </span>
             </div>
 
@@ -38,7 +38,7 @@ const MyLeads = () => {
                         <tr>
                             <th className="px-6 py-3">Name</th>
                             <th className="px-6 py-3">Email</th>
-                            <th className="px-6 py-3">Statut</th>
+                            <th className="px-6 py-3">Status</th>
                             <th className="px-6 py-3 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -65,7 +65,7 @@ const MyLeads = () => {
                 </table>
                 {leads.length === 0 && (
                     <div className="p-10 text-slate-500 text-center">
-                        No assigned prospects for now
+                        No Leads assigned yet
                     </div>
                 )}
             </div>
