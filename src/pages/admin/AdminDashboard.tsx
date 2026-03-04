@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { Users, TrendingUp, PhoneIncoming, CheckCircle2, Loader2 } from 'lucide-react';
 import api from '../../api/axios'; // Ton instance axios configurée
 
@@ -47,7 +46,6 @@ function AdminDashboard() {
   }, []);
 
   return (
-    <DashboardLayout>
       <div className="p-8">
         <header className="mb-8">
           <h1 className="font-bold text-white text-3xl">Overview</h1>
@@ -100,7 +98,6 @@ function AdminDashboard() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
   );
 }
 

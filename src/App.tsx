@@ -10,32 +10,53 @@ import UserDashboard from "./pages/user/UserDashboard";
 import Profile from "./pages/user/Profile";
 import MyLeads from "./pages/user/MyLeads";
 
-function App() {
+/**
+ * Dynamic Home Redirector
+ * Checks user role from localStorage on every render to avoid stale data issues.
+ */
+const HomeRedirect = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return user.role === 'COMPANY_ADMIN' ? <AdminDashboard /> : <UserDashboard />;
+};
 
+/**
+ * Dynamic Leads Redirector
+ * Routes to Admin Leads or Agent's MyLeads based on the current user role.
+ */
+const LeadsRedirect = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return user.role === 'COMPANY_ADMIN' ? <Leads /> : <MyLeads />;
+};
+
+function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Route */}
         <Route path="/login" element={<Login />} />
 
+        {/* Protected Routes Wrapper */}
         <Route element={<ProtectedRoute allowedRoles={['STANDARD_USER', 'COMPANY_ADMIN']} />}>
           <Route element={<DashboardLayout />}>
-            <Route 
-              path="/" 
-              element={user.role === 'COMPANY_ADMIN' ? <AdminDashboard /> : <UserDashboard />} 
-            />
+            
+            {/* DYNAMIC PATHS 
+                Using redirect components ensures the role is re-evaluated 
+                after login/logout without requiring a manual page refresh.
+            */}
+            <Route path="/" element={<HomeRedirect />} />
+            <Route path="/leads" element={<LeadsRedirect />} />
+            
+            {/* Common Routes */}
             <Route path="/profile" element={<Profile />} />
-            <Route 
-              path="/leads" 
-              element={user.role === 'COMPANY_ADMIN' ? <Leads /> : <MyLeads />} 
-            />
-            {/* Routes Admin */}
+
+            {/* Strict Admin Routes */}
             <Route path="/users" element={<Users />} />
             <Route path="/reports" element={<Analytics />} />
           </Route>
         </Route>
 
-        <Route path="*" element={<Navigate to="/login" />} />
+        {/* Catch-all Redirect */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

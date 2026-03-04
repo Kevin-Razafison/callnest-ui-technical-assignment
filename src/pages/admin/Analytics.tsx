@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Calendar, Loader2, AlertCircle } from 'lucide-react';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import api from '../../api/axios'; 
 
 const AnalyticsCard = ({ title, children }: any) => (
@@ -40,7 +39,6 @@ function Analytics() {
   }, []);
 
   return (
-    <DashboardLayout>
       <div className="space-y-8 p-8">
         <header>
           <h1 className="font-bold text-white text-3xl tracking-tight">Analytics Reports</h1>
@@ -101,7 +99,6 @@ function Analytics() {
            </button>
         </div>
       </div>
-    </DashboardLayout>
   );
 }
 
