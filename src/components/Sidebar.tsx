@@ -4,8 +4,9 @@ import {
   Users, 
   BarChart3, 
   PhoneCall,
-  ShieldCheck, 
-  LogOut 
+  ShieldCheck,
+  User, 
+  LogOut
 } from 'lucide-react';
 import { authService } from '../api/authService';
 
@@ -22,6 +23,7 @@ const Sidebar = () => {
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard, roles: ['COMPANY_ADMIN', 'STANDARD_USER'] },
     { name: 'Leads', path: '/leads', icon: Users, roles: ['COMPANY_ADMIN', 'STANDARD_USER'] },
+    { name: 'Profile', path: '/profile', icon: User, roles: ['COMPANY_ADMIN', 'STANDARD_USER'] },
     { name: 'Analytics', path: '/reports', icon: BarChart3, roles: ['COMPANY_ADMIN'] }, 
     { name: 'Team', path: '/users', icon: ShieldCheck, roles: ['COMPANY_ADMIN'] },    
   ];
