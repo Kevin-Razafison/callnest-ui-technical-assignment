@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Leads from './pages/Leads';
+import Login from './pages/auth/Login';
+import Dashboard from './pages/admin/Dashboard';
+import Leads from './pages/admin/Leads';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const isAuthenticated = !!localStorage.getItem('token');

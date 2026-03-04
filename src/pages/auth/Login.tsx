@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
-import { authService } from '../api/authService';
+import { authService } from '../../api/authService';
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();

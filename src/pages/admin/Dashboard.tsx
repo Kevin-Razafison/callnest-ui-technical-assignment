@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import DashboardLayout from '../layouts/DashboardLayout';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import { Users, TrendingUp, PhoneIncoming, CheckCircle2, Loader2 } from 'lucide-react';
-import api from '../api/axios'; // Ton instance axios configurée
+import api from '../../api/axios'; // Ton instance axios configurée
 
 const StatCard = ({ title, value, icon: Icon, color, loading, trend }: any) => (
   <div className="bg-slate-900 shadow-sm p-6 border border-slate-800 rounded-2xl">

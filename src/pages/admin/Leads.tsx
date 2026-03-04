@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import api from "../api/axios";
-import DashboardLayout from "../layouts/DashboardLayout";
+import api from "../../api/axios";
+import DashboardLayout from "../../layouts/DashboardLayout";
 import { Plus, X, Loader2, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Pencil, Trash2 } from "lucide-react";
