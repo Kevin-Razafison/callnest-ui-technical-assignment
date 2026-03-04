@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from '../../api/axios'; 
+import api from '../../api/axios'; 
 import type { Lead } from '../../types/leads';
 const MyLeads = () => {
     const [leads, setLeads] = useState<Lead[]>([]);
@@ -8,8 +8,7 @@ const MyLeads = () => {
     useEffect(() => {
         const fetchMyLeads = async () => {
             try {
-                // On appelle le endpoint qui filtre par utilisateur connecté
-                const response = await axios.get('/api/v1/leads/my');
+                    const response = await api.get('/leads/my');
                 setLeads(response.data);
             } catch (error) {
                 console.error("Erreur lors de la récupération de mes leads", error);
