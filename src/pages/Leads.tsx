@@ -3,12 +3,39 @@ import api from "../api/axios";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { Plus, X, Loader2, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { Pencil, Trash2 } from "lucide-react";
+import { Search } from "lucide-react";
 
 function Leads() {
     const [leads, setLeads] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const [editingLead, setEditingLead] = useState<any>(null);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const handleDelete = async (id: number) => {
+        if(window.confirm("Are you sure you want to delete this lead?")) {
+            try {
+                await api.delete(`/leads/${id}`);
+                fetchLeads();
+            } catch (err) {
+                console.error("Delete failed", err);
+            }
+        }
+    }
+
+    const filteredLeads = leads.filter((lead: any) => 
+        lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.phone.includes(searchTerm)
+    );
+
+    const openEditModal = (lead: any) => {
+        setEditingLead(lead);
+        setIsModalOpen(true);
+        reset(lead);
+    }
 
     const fetchLeads = () => {
         api.get('/leads')
@@ -23,18 +50,20 @@ function Leads() {
     const onSubmit = async (data: any) => {
         setIsSubmitting(true);
         try {
-            // 'data' contient maintenant { name, email, phone } grâce à register()
-            const payload = {
-                ...data,
-                status: 'NEW' 
-            };
-
-            await api.post('/leads', payload);
+            if (editingLead) {
+                // Mode Edition : call PUT
+                await api.put(`/leads/${editingLead.id}`, data);
+            } else {
+                // Mode Création : call POST
+                await api.post('/leads', { ...data, status: 'NEW' });
+            }
+            
             setIsModalOpen(false);
-            reset(); 
-            fetchLeads(); 
-        } catch (err: any) {
-            console.error("Error creating lead:", err.response?.data);
+            setEditingLead(null);
+            reset();
+            fetchLeads();
+        } catch (err) {
+            console.error("Operation failed", err);
         } finally {
             setIsSubmitting(false);
         }
@@ -48,13 +77,25 @@ function Leads() {
                         <h1 className="font-bold text-white text-3xl tracking-tight">Leads Management</h1>
                         <p className="mt-1 text-slate-400">Manage and track your business opportunities.</p>
                     </div>
+                    
                     <button 
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => { setEditingLead(null); reset({name: '', email: '', phone: ''}); setIsModalOpen(true); }}
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 shadow-blue-900/20 shadow-lg px-4 py-2 rounded-lg font-semibold text-white transition-all"
                     >
                         <Plus className="w-5 h-5" />
                         Add Lead
                     </button>
+                </div>
+                {/* Search Bar */}
+                <div className="relative mb-6 max-w-md">
+                    <Search className="top-1/2 left-3 absolute w-5 h-5 text-slate-500 -translate-y-1/2" />
+                    <input 
+                        type="text"
+                        placeholder="Search by name, email or phone..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="bg-slate-900 py-3 pr-4 pl-11 border border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 w-full text-white text-sm transition-all"
+                    />
                 </div>
 
                 {/* Table Container */}
@@ -66,11 +107,12 @@ function Leads() {
                                 <th className="p-4 font-medium text-slate-400">Email</th>
                                 <th className="p-4 font-medium text-slate-400">Phone</th>
                                 <th className="p-4 font-medium text-slate-400">Status</th>
+                                <th className="p-4 font-medium text-slate-400 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800">
-                            {leads.length > 0 ? leads.map((lead: any) => (
-                                <tr key={lead.id} className="hover:bg-slate-800/50 transition-colors">
+                            {filteredLeads.length > 0 ? filteredLeads.map((lead: any) => (
+                                <tr key={lead.id} className="group hover:bg-slate-800/50 transition-colors">
                                     <td className="p-4 font-medium">{lead.name}</td>
                                     <td className="p-4 text-slate-300">{lead.email}</td>
                                     <td className="p-4 text-slate-300">{lead.phone}</td>
@@ -79,10 +121,30 @@ function Leads() {
                                             {lead.status}
                                         </span>
                                     </td>
+                                    {/* Nouvelle cellule pour les Actions */}
+                                    <td className="p-4 text-right">
+                                        <div className="flex justify-end items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button 
+                                                onClick={() => openEditModal(lead)}
+                                                className="hover:bg-slate-700 p-2 rounded-lg text-slate-400 hover:text-blue-400 transition-all"
+                                                title="Edit lead"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDelete(lead.id)}
+                                                className="hover:bg-red-900/20 p-2 rounded-lg text-slate-400 hover:text-red-500 transition-all"
+                                                title="Delete lead"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={3} className="p-12 text-slate-500 text-center">
+                                    {/* Attention : n'oublie pas de passer colSpan à 5 car on a ajouté des colonnes */}
+                                    <td colSpan={5} className="p-12 text-slate-500 text-center">
                                         <div className="flex flex-col items-center gap-3">
                                             <UserPlus className="w-12 h-12 text-slate-700" />
                                             <p>No leads found. Start by adding one!</p>
@@ -99,8 +161,8 @@ function Leads() {
                     <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm p-4">
                         <div className="bg-slate-900 shadow-2xl border border-slate-800 rounded-2xl w-full max-w-md animate-in duration-200 fade-in zoom-in">
                             <div className="flex justify-between items-center p-6 border-slate-800 border-b">
-                                <h2 className="font-bold text-xl">New Lead</h2>
-                                <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
+                                <h2 className="font-bold text-xl">{editingLead ? "Edit Lead" : "New Lead"}</h2>
+                                <button onClick={() => { setIsModalOpen(false); setEditingLead(null); }} className="text-slate-400 hover:text-white">
                                     <X className="w-6 h-6" />
                                 </button>
                             </div>
@@ -139,7 +201,11 @@ function Leads() {
                                     type="submit" 
                                     className="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 mt-4 py-3 rounded-lg w-full font-bold"
                                 >
-                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Lead"}
+                                   {isSubmitting ? (
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : (
+                                        editingLead ? "Save Changes" : "Create Lead" // Texte dynamique
+                                    )}
                                 </button>
                             </form>
                         </div>
