@@ -6,37 +6,40 @@ import Analytics from "./pages/admin/Analytics";
 import Users from "./pages/admin/Users";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
+import Profile from "./pages/user/Profile";
 
 function App() {
-  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
     <Router>
       <Routes>
-        {/* Public Route */}
-        <Route path="/login" element ={<Login />} />
+        <Route path="/login" element={<Login />} />
 
-        {/* Protected Routes */}
-        <Route element = {<ProtectedRoute allowedRoles={['STANDARD_USER','COMPANY_ADMIN']} />}>
+        {/* Routes for all connected User */}
+        <Route element={<ProtectedRoute allowedRoles={['STANDARD_USER', 'COMPANY_ADMIN']} />}>
           <Route 
             path="/" 
             element={user.role === 'COMPANY_ADMIN' ? <AdminDashboard /> : <UserDashboard />} 
           />
-          <Route path="/leads" element={<Leads />} />
+          <Route path="/profile" element={<Profile />} />
           
+          {/* Redirection /leads */}
+          <Route 
+            path="/leads" 
+            element={user.role === 'COMPANY_ADMIN' ? <Leads /> : <MyLeads />} 
+          />
         </Route>
 
-        {/*Route only fot the Admins */}
+        {/* Routes Admins only */}
         <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN']} />}>
           <Route path="/users" element={<Users />} />
           <Route path="/reports" element={<Analytics />} />
         </Route>
 
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
-  )
+  );
 }
-
 export default App;
