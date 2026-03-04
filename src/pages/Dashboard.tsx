@@ -3,13 +3,18 @@ import DashboardLayout from '../layouts/DashboardLayout';
 import { Users, TrendingUp, PhoneIncoming, CheckCircle2, Loader2 } from 'lucide-react';
 import api from '../api/axios'; // Ton instance axios configurée
 
-const StatCard = ({ title, value, icon: Icon, color, loading }: any) => (
+const StatCard = ({ title, value, icon: Icon, color, loading, trend }: any) => (
   <div className="bg-slate-900 shadow-sm p-6 border border-slate-800 rounded-2xl">
     <div className="flex justify-between items-center mb-4">
       <div className={`p-3 rounded-xl ${color}`}>
         <Icon className="w-6 h-6 text-white" />
       </div>
-      {!loading && <span className="font-medium text-green-400 text-sm">+12%</span>}
+      {/* On affiche le trend uniquement si on ne charge pas et s'il existe */}
+      {!loading && trend !== undefined && (
+        <span className={`font-medium text-sm px-2 py-0.5 rounded-full ${trend >= 0 ? 'bg-green-900/20 text-green-400' : 'bg-red-900/20 text-red-400'}`}>
+          {trend >= 0 ? '+' : ''}{trend}%
+        </span>
+      )}
     </div>
     <h3 className="font-medium text-slate-400 text-sm">{title}</h3>
     <div className="flex items-center mt-1">
@@ -57,6 +62,7 @@ function Dashboard() {
             icon={Users} 
             color="bg-blue-600" 
             loading={loading}
+            trend={stats?.growthRate}
           />
           <StatCard 
             title="Active Calls" 
@@ -64,6 +70,7 @@ function Dashboard() {
             icon={PhoneIncoming} 
             color="bg-purple-600" 
             loading={loading}
+            trend={stats?.growthRate}
           />
           <StatCard 
             title="Conversions" 
@@ -71,6 +78,7 @@ function Dashboard() {
             icon={CheckCircle2} 
             color="bg-emerald-600" 
             loading={loading}
+            trend={stats?.growthRate}
           />
           <StatCard 
             title="Revenue Growth" 
@@ -78,6 +86,7 @@ function Dashboard() {
             icon={TrendingUp} 
             color="bg-amber-600" 
             loading={loading}
+            trend={stats?.growthRate}
           />
         </div>
 
