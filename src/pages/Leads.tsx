@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { div, tr } from "framer-motion/client";
 
 function Leads() {
     const [leads, setLeads] = useState([]);

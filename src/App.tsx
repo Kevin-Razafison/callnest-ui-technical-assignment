@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 import Leads from './pages/Leads';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -14,7 +15,12 @@ function App() {
         {/* Public Route */}
         <Route path="/login" element ={<Login />} />
 
-
+        {/* Protected Routes */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
 
         <Route path="/leads" element={
           <ProtectedRoute>
