@@ -20,10 +20,10 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Leads', path: '/leads', icon: Users },
-    { name: 'Analytics', path: '/reports', icon: BarChart3 },
-    { name: 'Team', path: '/users', icon: ShieldCheck },
+    { name: 'Dashboard', path: '/', icon: LayoutDashboard, roles: ['COMPANY_ADMIN', 'STANDARD_USER'] },
+    { name: 'Leads', path: '/leads', icon: Users, roles: ['COMPANY_ADMIN', 'STANDARD_USER'] },
+    { name: 'Analytics', path: '/reports', icon: BarChart3, roles: ['COMPANY_ADMIN'] }, 
+    { name: 'Team', path: '/users', icon: ShieldCheck, roles: ['COMPANY_ADMIN'] },    
   ];
 
   return (
@@ -38,24 +38,26 @@ const Sidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-2 mt-6 px-4">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-          return (
-            <Link 
-              key={item.name}
-              to={item.path} 
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                isActive 
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              {item.name}
-            </Link>
-          );
-        })}
+        {navItems
+          .filter(item => item.roles.includes(user.role))
+          .map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <Link 
+                key={item.name}
+                to={item.path} 
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  isActive 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                {item.name}
+              </Link>
+            );
+          })}
       </nav>
 
       {/* User & Logout Section */}
