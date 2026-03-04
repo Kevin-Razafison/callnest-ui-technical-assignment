@@ -1,11 +1,9 @@
-import DashboardLayout from '../../layouts/DashboardLayout';
 import {  Mail, Shield, Key } from 'lucide-react';
 
 function Profile() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
-    <DashboardLayout>
       <div className="mx-auto p-8 max-w-2xl">
         <header className="mb-8 md:text-left text-center">
           <h1 className="font-bold text-white text-3xl">My Profile</h1>
@@ -43,7 +41,6 @@ function Profile() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
   );
 }
 

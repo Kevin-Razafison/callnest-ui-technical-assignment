@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { UserPlus, Trash2, Loader2, X } from 'lucide-react';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import api from '../../api/axios';
 
 interface User {
@@ -48,7 +47,6 @@ function Users() {
   };
 
   return (
-    <DashboardLayout>
       <div className="space-y-8 p-8">
         <div className="flex justify-between items-center">
           <div>
@@ -132,7 +130,6 @@ function Users() {
           </div>
         )}
       </div>
-    </DashboardLayout>
   );
 }
 

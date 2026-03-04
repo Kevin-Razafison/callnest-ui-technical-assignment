@@ -1,6 +1,6 @@
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { useEffect, useState } from 'react';
 import { PhoneIncoming, Star, Clock, CheckCircle2 } from 'lucide-react';
+import { type Lead, type UserStats as DashboardCounts } from '../../types/leads';
 import type { LucideIcon } from 'lucide-react';
 import api from '../../api/axios';
 
@@ -13,19 +13,7 @@ interface StatItem {
     bg: string;
 }
 
-interface Lead {
-    id: number;
-    firstName: string;
-    lastName: string;
-    status: string;
-    createdAt: string;
-}
 
-interface DashboardCounts {
-    total: number;
-    new: number;
-    closed: number;
-}
 
 function UserDashboard() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -37,7 +25,7 @@ function UserDashboard() {
         new: 0,
         closed: 0
     });
-    
+
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
@@ -65,7 +53,6 @@ function UserDashboard() {
     ];
 
     return (
-        <DashboardLayout>
             <div className="space-y-8 p-8">
                 {/* Header */}
                 <div>
@@ -96,7 +83,7 @@ function UserDashboard() {
                         <h2 className="mb-6 font-bold text-white text-xl">Priority Leads to Call</h2>
                         <div className="space-y-4">
                             {loading ? (
-                                <p className="text-slate-500 italic">Loading your leads...</p>
+                                <p className="text-slate-500 text-sm italic">Loading your leads...</p>
                             ) : priorityLeads.length > 0 ? (
                                 priorityLeads.map((lead) => (
                                     <div key={lead.id} className="group flex justify-between items-center bg-slate-950 p-4 border border-slate-800 hover:border-blue-500/50 rounded-xl transition-all cursor-pointer">
@@ -106,9 +93,9 @@ function UserDashboard() {
                                             </div>
                                             <div>
                                                 <p className="font-medium text-white group-hover:text-blue-400 transition-colors">
-                                                    {lead.firstName} {lead.lastName}
+                                                    {lead.name} {/* CHANGED: from firstName/lastName to name */}
                                                 </p>
-                                                <p className="text-slate-500 text-xs">Priority Lead</p>
+                                                <p className="text-slate-500 text-xs uppercase tracking-wide">Priority Lead</p>
                                             </div>
                                         </div>
                                         <button className="bg-slate-800 hover:bg-blue-600 px-4 py-2 rounded-lg font-bold text-white text-sm transition-colors">
@@ -117,7 +104,7 @@ function UserDashboard() {
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-slate-500 italic">No priority leads assigned to you yet.</p>
+                                <p className="text-slate-500 text-sm italic">No priority leads assigned to you yet.</p>
                             )}
                         </div>
                     </div>
@@ -132,7 +119,6 @@ function UserDashboard() {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
     );
 }
 
