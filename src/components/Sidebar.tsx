@@ -3,7 +3,8 @@ import {
   LayoutDashboard, 
   Users, 
   BarChart3, 
-  PhoneCall, 
+  PhoneCall,
+  ShieldCheck, 
   LogOut 
 } from 'lucide-react';
 import { authService } from '../api/authService';
@@ -22,6 +23,7 @@ const Sidebar = () => {
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
     { name: 'Leads', path: '/leads', icon: Users },
     { name: 'Analytics', path: '/reports', icon: BarChart3 },
+    { name: 'Team', path: '/users', icon: ShieldCheck },
   ];
 
   return (

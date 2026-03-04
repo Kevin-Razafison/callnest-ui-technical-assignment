@@ -3,6 +3,7 @@ import Login from './pages/auth/Login';
 import Dashboard from './pages/admin/Dashboard';
 import Leads from './pages/admin/Leads';
 import Analytics from "./pages/admin/Analytics";
+import Users from "./pages/admin/Users";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const isAuthenticated = !!localStorage.getItem('token');
@@ -30,6 +31,7 @@ function App() {
         } />
 
         <Route path="/reports" element={<Analytics />} />
+        <Route path="/users" element={<Users />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" />} />
