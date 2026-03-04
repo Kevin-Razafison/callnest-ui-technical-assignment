@@ -42,26 +42,31 @@ function Leads() {
     const onSubmit = async (data: any) => {
         setIsSubmitting(true);
         try {
-            // Prepare payload: convert assignedToId to a proper object reference for JPA
             const payload = {
-                ...data,
+                id: editingLead?.id, 
+                name: data.name,
+                email: data.email,   
+                phone: data.phone,
+                status: editingLead ? editingLead.status : 'NEW',
                 assignedTo: data.assignedToId ? { id: parseInt(data.assignedToId) } : null
             };
 
+            console.log("Sending payload:", payload); 
+
             if (editingLead) {
-                // Update existing lead
                 await api.put(`/leads/${editingLead.id}`, payload);
             } else {
-                // Create new lead with default status
-                await api.post('/leads', { ...payload, status: 'NEW' });
+                await api.post('/leads', payload);
             }
             
             setIsModalOpen(false);
             setEditingLead(null);
             reset();
             fetchLeads();
-        } catch (err) {
-            console.error("Operation failed", err);
+        } catch (err: any) {
+            // Pour voir exactement quel champ pose problème
+            console.error("Validation Error Details:", err.response?.data);
+            alert("Check fields: " + JSON.stringify(err.response?.data));
         } finally {
             setIsSubmitting(false);
         }
