@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users as UsersIcon, UserPlus, Trash2, Loader2, X } from 'lucide-react';
+import { UserPlus, Trash2, Loader2, X } from 'lucide-react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import api from '../../api/axios';
 

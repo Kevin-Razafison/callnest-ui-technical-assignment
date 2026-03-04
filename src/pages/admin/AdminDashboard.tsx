@@ -27,7 +27,7 @@ const StatCard = ({ title, value, icon: Icon, color, loading, trend }: any) => (
   </div>
 );
 
-function Dashboard() {
+function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -104,4 +104,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default AdminDashboard;
