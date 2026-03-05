@@ -10,6 +10,7 @@ import UserDashboard from "./pages/user/UserDashboard";
 import Profile from "./pages/user/Profile";
 import MyLeads from "./pages/user/MyLeads";
 import Register from "./pages/auth/Register";
+import SystemDashboard from "./pages/system/SystemDashboard";
 
 /**
  * Dynamic Home Redirector
@@ -17,6 +18,7 @@ import Register from "./pages/auth/Register";
  */
 const HomeRedirect = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (user.role === 'SYSTEM_ADMIN') return <SystemDashboard />;
   return user.role === 'COMPANY_ADMIN' ? <AdminDashboard /> : <UserDashboard />;
 };
 
@@ -26,6 +28,7 @@ const HomeRedirect = () => {
  */
 const LeadsRedirect = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (user.role === 'SYSTEM_ADMIN') return <Navigate to="/" replace />;
   return user.role === 'COMPANY_ADMIN' ? <Leads /> : <MyLeads />;
 };
 
@@ -33,31 +36,36 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Route */}
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Routes Wrapper */}
-        <Route element={<ProtectedRoute allowedRoles={['STANDARD_USER', 'COMPANY_ADMIN']} />}>
+        {/* Protected Routes Wrapper - On ajoute SYSTEM_ADMIN ici */}
+        <Route element={<ProtectedRoute allowedRoles={['STANDARD_USER', 'COMPANY_ADMIN', 'SYSTEM_ADMIN']} />}>
           <Route element={<DashboardLayout />}>
             
-            {/* DYNAMIC PATHS 
-                Using redirect components ensures the role is re-evaluated 
-                after login/logout without requiring a manual page refresh.
-            */}
+            {/* DYNAMIC PATHS */}
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/leads" element={<LeadsRedirect />} />
             
             {/* Common Routes */}
             <Route path="/profile" element={<Profile />} />
 
-            {/* Strict Admin Routes */}
-            <Route path="/users" element={<Users />} />
-            <Route path="/reports" element={<Analytics />} />
+            {/* Routes réservées au COMPANY_ADMIN (Tenant Admin) */}
+            <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN']} />}>
+              <Route path="/users" element={<Users />} />
+              <Route path="/reports" element={<Analytics />} />
+            </Route>
+
+            {/* Routes réservées au SYSTEM_ADMIN (Platform Owner) */}
+            <Route element={<ProtectedRoute allowedRoles={['SYSTEM_ADMIN']} />}>
+               {/* Si tu as une page spécifique pour lister les entreprises au delà du dashboard */}
+               <Route path="/system-companies" element={<SystemDashboard />} />
+            </Route>
+            
           </Route>
         </Route>
 
-        {/* Catch-all Redirect */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

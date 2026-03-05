@@ -1,22 +1,18 @@
 import { useState } from 'react';
-import { Mail, Shield, Key, X, Save, Eye, EyeOff } from 'lucide-react';
+import { Mail, Shield, Key, X, Save, Eye, EyeOff, Building2 } from 'lucide-react';
 import api from '../../api/axios';
 
 function Profile() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   
-  // States for UI management
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
-  // States for password data
   const [passwords, setPasswords] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
   
-  // State for feedback messages
   const [status, setStatus] = useState<{type: 'success' | 'error' | '', message: string}>({
     type: '',
     message: ''
@@ -55,23 +51,27 @@ function Profile() {
 
       <div className="bg-slate-900 shadow-xl border border-slate-800 rounded-2xl overflow-hidden">
         <div className="space-y-6 p-8">
+          
           {/* User Identity Section */}
           <div className="flex items-center gap-6">
-            <div className="flex justify-center items-center bg-blue-600 rounded-full w-20 h-20 font-bold text-white text-2xl uppercase">
+            <div className={`flex justify-center items-center rounded-full w-20 h-20 font-bold text-white text-2xl uppercase ${
+              user.role === 'SYSTEM_ADMIN' ? 'bg-amber-500 shadow-lg shadow-amber-900/20' : 'bg-blue-600'
+            }`}>
               {user.email?.substring(0, 2)}
             </div>
             <div>
               <h2 className="font-bold text-white text-xl">{user.email}</h2>
               <div className="flex items-center gap-2 mt-1">
-                <Shield className="w-4 h-4 text-blue-500" />
-                <span className="font-bold text-slate-500 text-xs uppercase tracking-widest">{user.role}</span>
+                <Shield className={`w-4 h-4 ${user.role === 'SYSTEM_ADMIN' ? 'text-amber-500' : 'text-blue-500'}`} />
+                <span className="font-bold text-slate-500 text-xs uppercase tracking-widest">
+                    {user.role?.replace('_', ' ')}
+                </span>
               </div>
             </div>
           </div>
 
           <hr className="border-slate-800" />
 
-          {/* Feedback Alerts */}
           {status.message && (
             <div className={`p-4 rounded-xl text-sm font-bold ${
               status.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
@@ -81,7 +81,7 @@ function Profile() {
           )}
 
           <div className="space-y-6">
-            {/* Email Information */}
+            {/* Email */}
             <div className="flex items-center gap-4 text-slate-300">
               <Mail className="w-5 h-5 text-slate-500" />
               <div className="flex flex-col">
@@ -90,7 +90,18 @@ function Profile() {
               </div>
             </div>
 
-            {/* Password Section Toggle */}
+            {/* Organization / Company Section */}
+            <div className="flex items-center gap-4 text-slate-300">
+              <Building2 className="w-5 h-5 text-slate-500" />
+              <div className="flex flex-col">
+                <span className="font-bold text-[10px] text-slate-500 uppercase tracking-widest">Organization</span>
+                <span className={user.role === 'SYSTEM_ADMIN' ? 'text-amber-400 font-medium' : ''}>
+                    {user.companyName || 'CallNest Platform Root'}
+                </span>
+              </div>
+            </div>
+
+            {/* Password Toggle Section */}
             {!isEditing ? (
               <div className="flex items-center gap-4 text-slate-300">
                 <Key className="w-5 h-5 text-slate-500" />
@@ -106,7 +117,6 @@ function Profile() {
                 </button>
               </div>
             ) : (
-              /* Password Update Form */
               <form onSubmit={handleUpdatePassword} className="space-y-4 bg-slate-950/50 p-6 border border-slate-800 rounded-xl">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-bold text-white text-sm uppercase">Update Password</h3>
@@ -120,7 +130,7 @@ function Profile() {
                     type="password"
                     placeholder="Current Password"
                     required
-                    className="bg-slate-900 px-4 py-2 border border-slate-800 focus:border-blue-500 rounded-lg outline-none w-full text-sm transition-all"
+                    className="bg-slate-900 px-4 py-2 border border-slate-800 focus:border-blue-500 rounded-lg outline-none w-full text-white text-sm transition-all"
                     value={passwords.currentPassword}
                     onChange={(e) => setPasswords({...passwords, currentPassword: e.target.value})}
                   />
@@ -129,7 +139,7 @@ function Profile() {
                       type={showPassword ? "text" : "password"}
                       placeholder="New Password"
                       required
-                      className="bg-slate-900 px-4 py-2 border border-slate-800 focus:border-blue-500 rounded-lg outline-none w-full text-sm transition-all"
+                      className="bg-slate-900 px-4 py-2 border border-slate-800 focus:border-blue-500 rounded-lg outline-none w-full text-white text-sm transition-all"
                       value={passwords.newPassword}
                       onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
                     />
@@ -145,7 +155,7 @@ function Profile() {
                     type="password"
                     placeholder="Confirm New Password"
                     required
-                    className="bg-slate-900 px-4 py-2 border border-slate-800 focus:border-blue-500 rounded-lg outline-none w-full text-sm transition-all"
+                    className="bg-slate-900 px-4 py-2 border border-slate-800 focus:border-blue-500 rounded-lg outline-none w-full text-white text-sm transition-all"
                     value={passwords.confirmPassword}
                     onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
                   />

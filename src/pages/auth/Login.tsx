@@ -15,8 +15,15 @@ function Login() {
     setLoading(true);
     setErrorMessage('');
     try {
-      await authService.login(data.email, data.password);
-      navigate('/'); // Redirect to Dashboard on success
+      const response = await authService.login(data.email, data.password);
+      
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+      if (user.role === 'SYSTEM_ADMIN') {
+        navigate('/system-dashboard');
+      } else {
+        navigate('/'); 
+      }
     } catch (err: any) {
       setErrorMessage(err.response?.data?.message || "Invalid email or password. Please try again.");
     } finally {
