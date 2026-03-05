@@ -23,7 +23,8 @@ function UserDashboard() {
     const [counts, setCounts] = useState<DashboardCounts>({
         total: 0,
         new: 0,
-        closed: 0
+        closed: 0,
+        goal: 0
     });
 
     useEffect(() => {
@@ -111,14 +112,36 @@ function UserDashboard() {
 
                     {/* Goal Card */}
                     <div className="flex flex-col justify-center items-center bg-blue-600/5 p-6 border border-blue-500/20 rounded-2xl text-center">
-                        <div className="flex justify-center items-center mb-4 border-4 border-blue-600 border-t-transparent rounded-full w-24 h-24">
-                            <span className="font-bold text-white text-2xl">75%</span>
-                        </div>
-                        <h3 className="font-bold text-white text-lg">Daily Goal</h3>
-                        <p className="mt-2 text-slate-400 text-sm">Almost there! Reach your daily objective.</p>
+                        <div className="relative flex justify-center items-center mb-4 w-24 h-24">
+                            {/* Cercle de progression SVG pour faire plus pro */}
+                            <svg className="absolute w-full h-full -rotate-90">
+                                <circle
+                                    cx="48" cy="48" r="40"
+                                    stroke="currentColor" strokeWidth="8"
+                                    fill="transparent" className="text-slate-800"
+                                />
+                                <circle
+                                    cx="48" cy="48" r="40"
+                                    stroke="currentColor" strokeWidth="8"
+                                    fill="transparent"
+                                    strokeDasharray={251.2}
+                                    strokeDashoffset={251.2 - (251.2 * (counts.goal || 0)) / 100}
+                                    className="text-blue-600 transition-all duration-1000"
+                                />
+                            </svg>
+                        <span className="relative font-bold text-white text-2xl">
+                            {counts.goal || 0}%
+                        </span>
                     </div>
+                    <h3 className="font-bold text-white text-lg">Daily Goal</h3>
+                    <p className="mt-2 text-slate-400 text-sm">
+                        {counts.goal && counts.goal >= 100 
+                            ? "Objective reached! Great job! 🎯" 
+                            : "Almost there! Reach your daily objective."}
+                    </p>
                 </div>
             </div>
+        </div>
     );
 }
 

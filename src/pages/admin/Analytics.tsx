@@ -91,8 +91,7 @@ function Analytics() {
 
         <div className="flex md:flex-row flex-col justify-between items-center gap-6 bg-blue-600/10 p-8 border border-blue-500/20 rounded-2xl text-white md:text-left text-center">
            <div>
-             <h2 className="font-bold text-xl">Data is live! 🚀</h2>
-             <p className="text-blue-200/70">You are currently viewing data fetched from the {monthlyData.length} active months in your database.</p>
+             <h2 className="font-bold text-xl">Report</h2>
            </div>
            <button className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-bold transition-all">
              Export PDF Report

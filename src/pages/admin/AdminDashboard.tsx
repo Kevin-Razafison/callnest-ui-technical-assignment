@@ -49,7 +49,7 @@ function AdminDashboard() {
       <div className="p-8">
         <header className="mb-8">
           <h1 className="font-bold text-white text-3xl">Overview</h1>
-          <p className="text-slate-400">Real-time business insights from your database.</p>
+          <p className="text-slate-400">Real-time business insights</p>
         </header>
 
         {/* Stats Grid */}

@@ -18,4 +18,5 @@ export interface UserStats {
     total: number;
     new: number;
     closed: number;
+    goal:number;
 }
