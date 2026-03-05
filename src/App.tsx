@@ -7,24 +7,23 @@ import Analytics from "./pages/admin/Analytics";
 import Users from "./pages/admin/Users";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
-import Profile from "./pages/user/Profile";
+import Profile from "./pages/Profile";
 import MyLeads from "./pages/user/MyLeads";
 import Register from "./pages/auth/Register";
 import SystemDashboard from "./pages/system/SystemDashboard";
+import PlatformStats from "./pages/system/PlatformStats";
 
 /**
  * Dynamic Home Redirector
- * Checks user role from localStorage on every render to avoid stale data issues.
  */
 const HomeRedirect = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  if (user.role === 'SYSTEM_ADMIN') return <SystemDashboard />;
+  if (user.role === 'SYSTEM_ADMIN') return <PlatformStats />;
   return user.role === 'COMPANY_ADMIN' ? <AdminDashboard /> : <UserDashboard />;
 };
 
 /**
  * Dynamic Leads Redirector
- * Routes to Admin Leads or Agent's MyLeads based on the current user role.
  */
 const LeadsRedirect = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -40,7 +39,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Routes Wrapper - On ajoute SYSTEM_ADMIN ici */}
+        {/* Protected Routes Wrapper */}
         <Route element={<ProtectedRoute allowedRoles={['STANDARD_USER', 'COMPANY_ADMIN', 'SYSTEM_ADMIN']} />}>
           <Route element={<DashboardLayout />}>
             
@@ -51,15 +50,14 @@ function App() {
             {/* Common Routes */}
             <Route path="/profile" element={<Profile />} />
 
-            {/* Routes réservées au COMPANY_ADMIN (Tenant Admin) */}
+            {/* Routes  COMPANY_ADMIN (Tenant Admin) */}
             <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN']} />}>
               <Route path="/users" element={<Users />} />
               <Route path="/reports" element={<Analytics />} />
             </Route>
 
-            {/* Routes réservées au SYSTEM_ADMIN (Platform Owner) */}
+            {/* Routes SYSTEM_ADMIN (Platform Owner) */}
             <Route element={<ProtectedRoute allowedRoles={['SYSTEM_ADMIN']} />}>
-               {/* Si tu as une page spécifique pour lister les entreprises au delà du dashboard */}
                <Route path="/system-companies" element={<SystemDashboard />} />
             </Route>
             

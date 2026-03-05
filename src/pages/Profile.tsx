@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Mail, Shield, Key, X, Save, Eye, EyeOff, Building2 } from 'lucide-react';
-import api from '../../api/axios';
+import api from '../api/axios';
 
 function Profile() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
