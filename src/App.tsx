@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
 import Profile from "./pages/user/Profile";
 import MyLeads from "./pages/user/MyLeads";
+import Register from "./pages/auth/Register";
 
 /**
  * Dynamic Home Redirector
@@ -34,6 +35,7 @@ function App() {
       <Routes>
         {/* Public Route */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Protected Routes Wrapper */}
         <Route element={<ProtectedRoute allowedRoles={['STANDARD_USER', 'COMPANY_ADMIN']} />}>

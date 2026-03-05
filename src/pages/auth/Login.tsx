@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { authService } from '../../api/authService';
+import { Link } from 'react-router-dom';
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -93,7 +94,13 @@ function Login() {
 
         {/* Footer */}
         <p className="mt-8 text-slate-500 text-sm text-center">
-          Don't have an account? <span className="text-blue-400 hover:underline cursor-pointer">Contact your admin</span>
+          Don't have an account?{' '}
+          <Link 
+            to="/register" 
+            className="font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+          >
+            Create an account
+          </Link>
         </p>
       </div>
     </div>

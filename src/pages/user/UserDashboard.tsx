@@ -96,6 +96,9 @@ function UserDashboard() {
                                                 <p className="font-medium text-white group-hover:text-blue-400 transition-colors">
                                                     {lead.name} {/* CHANGED: from firstName/lastName to name */}
                                                 </p>
+                                                <p className="text-slate-500 text-xs uppercase tracking-wide">
+                                                    Added on: {new Date(lead.createdAt).toLocaleDateString()} {/* Affiche la date */}
+                                                </p>
                                                 <p className="text-slate-500 text-xs uppercase tracking-wide">Priority Lead</p>
                                             </div>
                                         </div>
