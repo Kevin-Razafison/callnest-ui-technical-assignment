@@ -28,22 +28,25 @@ const MyLeads = () => {
 
     // NEW: Handle Status Change Logic
     const handleStatusChange = async (lead: Lead, newStatus: string) => {
-        setUpdatingId(lead.id);
-        try {
-            // We send the current lead data but with the updated status
-            await api.put(`/leads/${lead.id}`, {
-                ...lead,
-                status: newStatus
-            });
-            // Refresh the list to show updated status
-            await fetchMyLeads();
-        } catch (error) {
-            console.error("Failed to update status", error);
-            alert("Could not update status. Please try again.");
-        } finally {
-            setUpdatingId(null);
-        }
-    };
+    setUpdatingId(lead.id);
+    try {
+        // On définit le stage en fonction du status pour que les graphiques suivent
+        let newStage = lead.stage; // valeur actuelle par défaut
+        if (newStatus === 'CONTACTED') newStage = 'PROPOSAL';
+        if (newStatus === 'QUALIFIED') newStage = 'NEGOTIATION';
+
+        await api.put(`/leads/${lead.id}`, {
+            ...lead,
+            status: newStatus,
+            stage: newStage // On envoie les deux au backend
+        });
+        await fetchMyLeads();
+    } catch (error) {
+        console.error("Failed to update status", error);
+    } finally {
+        setUpdatingId(null);
+    }
+};
 
     const filteredLeads = leads.filter(lead => {
         const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) || 

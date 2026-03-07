@@ -10,6 +10,7 @@ export interface Lead {
     email: string;
     phone: string;
     status: string;
+    stage: string;
     createdAt: string;
     assignedTo?: any; 
 }

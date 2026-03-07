@@ -2,9 +2,20 @@ import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import { 
   Plus, X, Loader2, UserPlus, UserCheck, 
-  Pencil, Trash2, Search 
+  Pencil, Trash2, Search, CheckSquare, Calendar as CalendarIcon
 } from "lucide-react";
 import { useForm } from "react-hook-form";
+
+const getStageColor = (stage: string) => {
+  switch(stage) {
+    case 'DISCOVERY': return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
+    case 'PROPOSAL': return 'bg-purple-500/20 text-purple-400 border-purple-500/50';
+    case 'NEGOTIATION': return 'bg-orange-500/20 text-orange-400 border-orange-500/50';
+    case 'CLOSED_WON': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50';
+    case 'CLOSED_LOST': return 'bg-red-500/20 text-red-400 border-red-500/50';
+    default: return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
+  }
+}
 
 function Leads() {
     // Main data states
@@ -19,6 +30,10 @@ function Leads() {
     
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
+    const [selectedLeadForTasks, setSelectedLeadForTasks] = useState<any>(null);
+    const [leadTasks, setLeadTasks] = useState<any[]>([]);
+    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
     // Fetch all leads for the admin view
     const fetchLeads = () => {
         api.get('/leads')
@@ -31,6 +46,21 @@ function Leads() {
         api.get('/users') 
             .then(res => setAgents(res.data))
             .catch(err => console.error("Failed to fetch agents", err));
+    };
+
+    const fetchLeadTasks = async (leadId: number) => {
+        try {
+            const res = await api.get(`/tasks/lead/${leadId}`); // Assure-toi d'avoir cet endpoint ou utilise un filtre
+            setLeadTasks(res.data);
+        } catch (err) {
+            console.error("Failed to fetch tasks", err);
+        }
+    };
+
+    const openTaskModal = (lead: any) => {
+        setSelectedLeadForTasks(lead);
+        fetchLeadTasks(lead.id);
+        setIsTaskModalOpen(true);
     };
 
     useEffect(() => {
@@ -163,10 +193,8 @@ function Leads() {
                                         )}
                                     </td>
                                     <td className="p-4">
-                                        <span className={`px-3 py-1 border rounded-full font-bold text-[10px] uppercase tracking-wider ${
-                                            lead.assignedTo ? 'bg-emerald-900/30 border-emerald-800/50 text-emerald-400' : 'bg-blue-900/30 border-blue-800/50 text-blue-400'
-                                        }`}>
-                                            {lead.status}
+                                        <span className={`px-3 py-1 border rounded-full font-bold text-[10px] uppercase tracking-wider ${getStageColor(lead.stage)}`}>
+                                            {lead.stage || lead.status}
                                         </span>
                                     </td>
                                     <td className="p-4 text-right">
@@ -177,6 +205,13 @@ function Leads() {
                                                 title="Edit lead"
                                             >
                                                 <Pencil className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => openTaskModal(lead)}
+                                                className="hover:bg-slate-700 p-2 rounded-lg text-slate-400 hover:text-emerald-400 transition-all"
+                                                title="Manage tasks"
+                                            >
+                                                <CheckSquare className="w-4 h-4" />
                                             </button>
                                             <button 
                                                 onClick={() => handleDelete(lead.id)}
@@ -274,7 +309,54 @@ function Leads() {
                         </div>
                     </div>
                 )}
+
+                {isTaskModalOpen && (
+    <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm p-4">
+        <div className="bg-slate-900 p-6 border border-slate-800 rounded-2xl w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="font-bold text-white text-xl">Tasks for {selectedLeadForTasks?.name}</h2>
+                <button onClick={() => setIsTaskModalOpen(false)} className="text-slate-400 hover:text-white"><X /></button>
             </div>
+
+            {/* Liste des tâches existantes */}
+            <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
+                {leadTasks.length > 0 ? leadTasks.map((task: any) => (
+                    <div key={task.id} className="flex justify-between items-center bg-slate-950 p-3 border border-slate-800 rounded-lg">
+                        <div>
+                            <p className={`text-sm font-medium ${task.completed ? 'line-through text-slate-500' : 'text-white'}`}>{task.title}</p>
+                            <p className="text-slate-500 text-xs">{new Date(task.dueDate).toLocaleDateString()}</p>
+                        </div>
+                        <input 
+                            type="checkbox" 
+                            checked={task.completed} 
+                            onChange={() => api.put(`/tasks/${task.id}/complete`).then(() => fetchLeadTasks(selectedLeadForTasks.id))}
+                            className="w-5 h-5 accent-blue-600"
+                        />
+                    </div>
+                )) : <p className="text-slate-500 text-sm text-center italic">No tasks scheduled yet.</p>}
+            </div>
+
+            {/* Formulaire rapide pour ajouter une tâche */}
+            <form onSubmit={async (e: any) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                await api.post('/tasks', {
+                    title: formData.get('title'),
+                    dueDate: formData.get('date'),
+                    lead: { id: selectedLeadForTasks.id },
+                    assignedTo: { id: selectedLeadForTasks.assignedTo?.id }
+                });
+                e.target.reset();
+                fetchLeadTasks(selectedLeadForTasks.id);
+                        }} className="space-y-3 pt-4 border-slate-800 border-t">
+                            <input name="title" placeholder="New task title..." className="bg-slate-950 p-2 border border-slate-800 rounded-lg w-full text-white text-sm" required />
+                            <input name="date" type="datetime-local" className="bg-slate-950 p-2 border border-slate-800 rounded-lg w-full text-white text-sm" required />
+                            <button type="submit" className="bg-blue-600 hover:bg-blue-500 py-2 rounded-lg w-full font-bold text-sm transition-all">Add Task</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
