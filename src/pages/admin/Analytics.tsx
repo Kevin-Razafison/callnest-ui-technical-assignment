@@ -134,6 +134,7 @@ function Analytics() {
                     paddingAngle={5}
                     dataKey="count"
                     nameKey="stage"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} // Add percentage labels
                   >
                     {pipelineData.map((entry, index) => (
                       <Cell 

@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Users, TrendingUp, PhoneIncoming, CheckCircle2, Loader2 } from 'lucide-react';
-import api from '../../api/axios'; // Ton instance axios configurée
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import api from '../../api/axios'; 
+
+const STAGE_COLORS: { [key: string]: string } = {
+  DISCOVERY: '#3b82f6',
+  PROPOSAL: '#a855f7',
+  NEGOTIATION: '#f97316',
+  CLOSED_WON: '#10b981',
+  CLOSED_LOST: '#ef4444',
+  UNKNOWN: '#64748b'
+};
 
 const StatCard = ({ title, value, icon: Icon, color, loading, trend }: any) => (
   <div className="bg-slate-900 shadow-sm p-6 border border-slate-800 rounded-2xl">
@@ -90,11 +100,74 @@ function AdminDashboard() {
 
         {/* Placeholder for Charts */}
         <div className="gap-6 grid grid-cols-1 lg:grid-cols-3 mt-8">
-          <div className="flex justify-center items-center lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl h-80 text-slate-500 italic">
-            Chart: Lead Generation over time (Coming soon)
+          <div className="lg:col-span-2 bg-slate-900 p-6 border border-slate-800 rounded-2xl">
+            <h3 className="mb-4 font-bold text-white">Pipeline Distribution</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={stats?.pipelineStats || []}
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="count"
+                    nameKey="stage"
+                    // Fix: Use 'name' instead of 'stage' and handle undefined percent
+                    label={({ name, percent }: any) => 
+                      `${name} ${(percent ? percent * 100 : 0).toFixed(0)}%`
+                    }
+                  >
+                    {stats?.pipelineStats?.map((entry: any, index: number) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={STAGE_COLORS[entry.stage.toUpperCase()] || STAGE_COLORS.UNKNOWN} 
+                        stroke="none"
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+                    itemStyle={{ color: '#fff' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36} /> 
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="flex justify-center items-center bg-slate-900 p-6 border border-slate-800 rounded-2xl h-80 text-slate-500 text-center italic">
-            Recent Activity Feed
+          <div className="flex flex-col bg-slate-900 p-6 border border-slate-800 rounded-2xl h-80">
+            <h3 className="mb-4 font-bold text-white">Recent Activity</h3>
+            <div className="flex-1 space-y-3 pr-2 overflow-y-auto custom-scrollbar">
+              {loading ? (
+                <div className="flex justify-center items-center h-full">
+                  <Loader2 className="w-6 h-6 text-slate-500 animate-spin" />
+                </div>
+              ) : stats?.recentLeads?.length > 0 ? (
+                stats.recentLeads.map((lead: any) => (
+                  <div key={lead.id} className="flex flex-col bg-slate-800/40 p-3 border border-slate-700/50 hover:border-slate-600 rounded-xl transition-colors">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="max-w-[120px] font-semibold text-white text-sm truncate">{lead.name}</span>
+                      <span 
+                        className="px-1.5 py-0.5 rounded font-bold text-[9px] uppercase"
+                        style={{ 
+                          backgroundColor: `${STAGE_COLORS[lead.stage?.toUpperCase()] || '#64748b'}20`, 
+                          color: STAGE_COLORS[lead.stage?.toUpperCase()] || '#64748b' 
+                        }}
+                      >
+                        {lead.stage}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] text-slate-500">
+                      <span>{lead.assignedTo ? `Agent: ${lead.assignedTo.name}` : 'Unassigned'}</span>
+                      <span>{new Date(lead.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col justify-center items-center h-full text-slate-500 text-sm italic">
+                  <p>No recent activity detected</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

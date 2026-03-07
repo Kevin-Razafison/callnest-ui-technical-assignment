@@ -112,6 +112,7 @@ const MyLeads = () => {
                                 <th className="px-6 py-4">Lead Name</th>
                                 <th className="px-6 py-4">Email</th>
                                 <th className="px-6 py-4">Status</th>
+                                <th className="px-6 py-4">Stage</th>
                                 <th className="px-6 py-4 text-right">Quick Actions</th>
                             </tr>
                         </thead>
@@ -120,23 +121,37 @@ const MyLeads = () => {
                                 <tr key={lead.id} className="group hover:bg-slate-800/30 transition-colors">
                                     <td className="px-6 py-4 font-semibold text-slate-200">{lead.name}</td>
                                     <td className="px-6 py-4 text-slate-400 text-sm">{lead.email}</td>
+                                    {/* 1. Colonne STATUS */}
                                     <td className="px-6 py-4">
                                         {updatingId === lead.id ? (
                                             <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
                                         ) : (
                                             <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
-                                                lead.status === 'NEW' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
-                                                lead.status === 'CONTACTED' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 
+                                                lead.status?.toUpperCase() === 'NEW' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
+                                                lead.status?.toUpperCase() === 'CONTACTED' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 
                                                 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                                             }`}>
-                                                {lead.status}
+                                                {lead.status || 'NEW'}
                                             </span>
                                         )}
                                     </td>
-                                   <td className="px-6 py-4 text-right">
+
+                                    {/* 2. Colonne STAGE (Remplacée) */}
+                                    <td className="px-6 py-4">
+                                        <span className={`px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider border ${
+                                            lead.stage === 'DISCOVERY' ? 'border-blue-500/50 text-blue-400 bg-blue-500/10' :
+                                            lead.stage === 'PROPOSAL' ? 'border-purple-500/50 text-purple-400 bg-purple-500/10' :
+                                            lead.stage === 'NEGOTIATION' ? 'border-orange-500/50 text-orange-400 bg-orange-500/10' :
+                                            'border-slate-700 text-slate-400 bg-slate-800/30'
+                                        }`}>
+                                            {lead.stage || 'DISCOVERY'}
+                                        </span>
+                                    </td>
+                                    {/* --- Quick Actions --- */}
+                                    <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end items-center gap-2">
-                                            {/* On convertit en majuscules pour la comparaison */}
-                                            {lead.status?.toUpperCase() === 'NEW' && (
+                                            {/* Utilisation de toUpperCase() pour la robustesse */}
+                                            {(!lead.status || lead.status.toUpperCase() === 'NEW') && (
                                                 <button 
                                                     onClick={() => handleStatusChange(lead, 'CONTACTED')}
                                                     className="flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg font-bold text-amber-400 text-xs transition-all"
@@ -156,8 +171,8 @@ const MyLeads = () => {
                                                 </button>
                                             )}
 
-                                            {/* Bouton de secours si le statut est autre ou vide */}
-                                            {(!lead.status || lead.status?.toUpperCase() === 'QUALIFIED') && (
+                                            {/* Œil de visualisation toujours présent pour les autres cas */}
+                                            {(lead.status?.toUpperCase() === 'QUALIFIED' || lead.status?.toUpperCase() === 'CLOSED') && (
                                                 <button className="hover:bg-slate-800 p-2 rounded-lg text-slate-400 transition-all">
                                                     <Eye className="w-4 h-4" />
                                                 </button>

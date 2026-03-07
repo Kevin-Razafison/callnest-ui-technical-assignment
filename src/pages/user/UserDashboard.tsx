@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { PhoneIncoming, Star, Clock, CheckCircle2 } from 'lucide-react';
+import { PhoneIncoming, Star, Clock, CheckCircle2, Calendar1Icon } from 'lucide-react';
 import { type Lead, type UserStats as DashboardCounts } from '../../types/leads';
 import type { LucideIcon } from 'lucide-react';
 import api from '../../api/axios';
@@ -17,8 +17,9 @@ interface StatItem {
 
 function UserDashboard() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const [priorityLeads, setPriorityLeads] = useState<Lead[]>([]); // Typage de l'état
+    const [priorityLeads, setPriorityLeads] = useState<Lead[]>([]); 
     const [loading, setLoading] = useState(true);
+    const [tasks, setTasks] = useState<any[]>([]); 
     
     const [counts, setCounts] = useState<DashboardCounts>({
         total: 0,
@@ -30,13 +31,14 @@ function UserDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                //two calls in parallel
-                const [leadsRes, statsRes] = await Promise.all([
+                const [leadsRes, statsRes, tasksRes] = await Promise.all([
                     api.get('/leads/my-priority'),
-                    api.get('/leads/my-stats')
+                    api.get('/leads/my-stats'),
+                    api.get('/tasks/my') // Ajout de l'appel pour les tâches
                 ]);
                 setPriorityLeads(leadsRes.data);
                 setCounts(statsRes.data);
+                setTasks(tasksRes.data); // On stocke les vraies tâches
             } catch (err) {
                 console.error("Erreur Data:", err);
             } finally {
@@ -112,29 +114,50 @@ function UserDashboard() {
                             )}
                         </div>
                     </div>
-
+                    {/* --- Section Calendrier & Objectifs --- */}
+                    <div className="space-y-6">
+                        {/* Mini Calendar / Upcoming Tasks */}
+                        <div className="bg-slate-900 p-6 border border-slate-800 rounded-2xl">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="flex items-center gap-2 font-bold text-white">
+                                    <Calendar1Icon className="w-5 h-5 text-blue-500" />
+                                    Upcoming Tasks
+                                </h3>
+                                <span className="text-blue-500 text-xs hover:underline cursor-pointer">View all</span>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                {tasks.length > 0 ? (
+                                    tasks.slice(0, 3).map((task) => ( // On affiche les 3 premières
+                                        <div key={task.id} className="bg-slate-950 p-3 border-blue-600 border-l-4 rounded-r-xl">
+                                            <p className="font-medium text-white text-sm">{task.title}</p>
+                                            <p className="mt-1 text-slate-500 text-xs">
+                                                {new Date(task.dueDate).toLocaleString('fr-FR', { 
+                                                    weekday: 'long', hour: '2-digit', minute: '2-digit' 
+                                                })}
+                                            </p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-slate-500 text-sm italic">No tasks for today.</p>
+                                )}
+                            </div>
+                        </div>
                     {/* Goal Card */}
                     <div className="flex flex-col justify-center items-center bg-blue-600/5 p-6 border border-blue-500/20 rounded-2xl text-center">
-                        <div className="relative flex justify-center items-center mb-4 w-24 h-24">
-                            {/* Cercle de progression SVG pour faire plus pro */}
+                        <div className="relative flex justify-center items-center mb-4 w-20 h-20">
                             <svg className="absolute w-full h-full -rotate-90">
+                                <circle cx="40" cy="40" r="35" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-slate-800" />
                                 <circle
-                                    cx="48" cy="48" r="40"
-                                    stroke="currentColor" strokeWidth="8"
-                                    fill="transparent" className="text-slate-800"
-                                />
-                                <circle
-                                    cx="48" cy="48" r="40"
-                                    stroke="currentColor" strokeWidth="8"
-                                    fill="transparent"
-                                    strokeDasharray={251.2}
-                                    strokeDashoffset={251.2 - (251.2 * (counts.goal || 0)) / 100}
+                                    cx="40" cy="40" r="35" stroke="currentColor" strokeWidth="6" fill="transparent"
+                                    strokeDasharray={219.8}
+                                    strokeDashoffset={219.8 - (219.8 * (counts.goal || 0)) / 100}
                                     className="text-blue-600 transition-all duration-1000"
                                 />
                             </svg>
-                        <span className="relative font-bold text-white text-2xl">
-                            {counts.goal || 0}%
-                        </span>
+                            <span className="relative font-bold text-white text-xl">{counts.goal || 0}%</span>
+                        </div>
+                        <h3 className="font-bold text-white text-sm">Daily Goal</h3>
                     </div>
                     <h3 className="font-bold text-white text-lg">Daily Goal</h3>
                     <p className="mt-2 text-slate-400 text-sm">

@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import { 
-  Plus, X, Loader2, UserPlus, UserCheck, 
-  Pencil, Trash2, Search, CheckSquare, Calendar as CalendarIcon
+Plus, X, Loader2, UserPlus, UserCheck, 
+Pencil, Trash2, Search, CheckSquare, Calendar as CalendarIcon
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 const getStageColor = (stage: string) => {
-  switch(stage) {
+switch(stage) {
     case 'DISCOVERY': return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
     case 'PROPOSAL': return 'bg-purple-500/20 text-purple-400 border-purple-500/50';
     case 'NEGOTIATION': return 'bg-orange-500/20 text-orange-400 border-orange-500/50';
     case 'CLOSED_WON': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50';
     case 'CLOSED_LOST': return 'bg-red-500/20 text-red-400 border-red-500/50';
     default: return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
-  }
+}
 }
 
 function Leads() {
@@ -78,6 +78,7 @@ function Leads() {
                 email: data.email,   
                 phone: data.phone,
                 status: editingLead ? editingLead.status : 'NEW',
+                stage: data.stage || (editingLead ? editingLead.stage : 'DISCOVERY'), 
                 assignedTo: data.assignedToId ? { id: parseInt(data.assignedToId) } : null
             };
 
@@ -121,7 +122,8 @@ function Leads() {
             name: lead.name,
             email: lead.email,
             phone: lead.phone,
-            assignedToId: lead.assignedTo?.id || ""
+            assignedToId: lead.assignedTo?.id || "",
+            stage: lead.stage || "DISCOVERY"
         });
     };
 
@@ -292,6 +294,19 @@ function Leads() {
                                             ))}
                                         </select>
                                     </div>
+                                    <div>
+                                        <label className="block mb-1 font-medium text-slate-400 text-sm">Pipeline Stage</label>
+                                        <select 
+                                            {...register("stage")}
+                                            className="bg-slate-950 p-3 border border-slate-800 rounded-lg outline-none focus:ring-2 focus:ring-blue-600 w-full text-white appearance-none cursor-pointer"
+                                        >
+                                            <option value="DISCOVERY">Discovery</option>
+                                            <option value="PROPOSAL">Proposal</option>
+                                            <option value="NEGOTIATION">Negotiation</option>
+                                            <option value="CLOSED_WON">Closed Won</option>
+                                            <option value="CLOSED_LOST">Closed Lost</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 
                                 <button 
@@ -299,7 +314,7 @@ function Leads() {
                                     type="submit" 
                                     className="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 mt-6 py-3 rounded-lg w-full font-bold text-white transition-all"
                                 >
-                                   {isSubmitting ? (
+                                {isSubmitting ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
                                         editingLead ? "Save Changes" : "Create Lead"
@@ -310,12 +325,12 @@ function Leads() {
                     </div>
                 )}
 
-                {isTaskModalOpen && (
-    <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm p-4">
-        <div className="bg-slate-900 p-6 border border-slate-800 rounded-2xl w-full max-w-md">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="font-bold text-white text-xl">Tasks for {selectedLeadForTasks?.name}</h2>
-                <button onClick={() => setIsTaskModalOpen(false)} className="text-slate-400 hover:text-white"><X /></button>
+            {isTaskModalOpen && (
+            <div className="z-50 fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm p-4">
+                <div className="bg-slate-900 p-6 border border-slate-800 rounded-2xl w-full max-w-md">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="font-bold text-white text-xl">Tasks for {selectedLeadForTasks?.name}</h2>
+                    <button onClick={() => setIsTaskModalOpen(false)} className="text-slate-400 hover:text-white"><X /></button>
             </div>
 
             {/* Liste des tâches existantes */}
