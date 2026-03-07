@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+@media print {
+  /* Hide sidebar, headers, and export buttons */
+  nav, aside, header, button, .no-print {
+    display: none !important;
+  }
+
+  /* Force the background to be dark or light as desired */
+  body {
+    background-color: #020617 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Make the charts take full width in the PDF */
+  #analytics-content {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+
+  .recharts-responsive-container {
+    width: 100% !important;
+    height: 400px !important; /* Force a fixed height for print */
+  }
+}
